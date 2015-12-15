@@ -1,16 +1,18 @@
 package Datastructures;
 
 import org.junit.Test;
+import org.la4j.vector.dense.BasicVector;
 
 public class OctreeTest {
 
     @Test
     public void testInsertToRoot() throws Exception {
         Octree tree = new Octree();
-        Point3D p = new Point3D(new float[]{-0.3f, 0.1f ,-0.3f});
+        BasicVector p = new BasicVector(new double[]{-0.3, 0.1 ,-0.3});
         tree.insert(p);
         assert tree.root.isLeaf == true;
         assert tree.root.points.contains(p);
+        assert tree.root.pointCount == 1;
     }
 
     @Test
@@ -19,14 +21,14 @@ public class OctreeTest {
         tree.root.createChildren();
         assert tree.root.isLeaf ==false;
 
-        Point3D p0 = new Point3D(new float[]{-0.3f, 0.1f ,0.3f});
-        Point3D p1 = new Point3D(new float[]{-0.3f, 0.1f ,-0.3f});
-        Point3D p2 = new Point3D(new float[]{0.3f, 0.1f ,-0.3f});
-        Point3D p3 = new Point3D(new float[]{0.3f, 0.1f ,0.7f});
-        Point3D p4 = new Point3D(new float[]{-0.3f, -0.1f ,0.3f});
-        Point3D p5 = new Point3D(new float[]{-0.3f, -0.1f ,-0.3f});
-        Point3D p6 = new Point3D(new float[]{0.3f, -0.1f ,-0.3f});
-        Point3D p7 = new Point3D(new float[]{0.3f, -0.1f ,0.7f});
+        BasicVector p0 = new BasicVector(new double[]{-0.3f, 0.1f ,0.3f});
+        BasicVector p1 = new BasicVector(new double[]{-0.3f, 0.1f ,-0.3f});
+        BasicVector p2 = new BasicVector(new double[]{0.3f, 0.1f ,-0.3f});
+        BasicVector p3 = new BasicVector(new double[]{0.3f, 0.1f ,0.7f});
+        BasicVector p4 = new BasicVector(new double[]{-0.3f, -0.1f ,0.3f});
+        BasicVector p5 = new BasicVector(new double[]{-0.3f, -0.1f ,-0.3f});
+        BasicVector p6 = new BasicVector(new double[]{0.3f, -0.1f ,-0.3f});
+        BasicVector p7 = new BasicVector(new double[]{0.3f, -0.1f ,0.7f});
         tree.insert(p0);
         tree.insert(p1);
         tree.insert(p2);
