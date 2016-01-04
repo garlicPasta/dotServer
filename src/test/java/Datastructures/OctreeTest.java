@@ -46,4 +46,38 @@ public class OctreeTest {
         assert tree.root.octants[6].points.contains(p6);
         assert tree.root.octants[7].points.contains(p7);
     }
+
+    @Test
+    public void testExtendTree0() throws Exception {
+        Octree tree = new Octree();
+        BasicVector p0 = new BasicVector(new double[]{-0.5,0.5,0.5});
+        BasicVector p1 = new BasicVector(new double[]{-1.5,0.5,0.5});
+        tree.insert(p0);
+        tree.insert(p1);
+        assert tree.root.octants[5].points.contains(p1);
+        assert tree.root.octants[6].points.contains(p0);
+    }
+
+    @Test
+    public void testExtendTree1() throws Exception {
+        Octree tree = new Octree();
+        BasicVector p0 = new BasicVector(new double[]{-0.5, 0.5, 0.5});
+        BasicVector p1 = new BasicVector(new double[]{1.5, -1.5, -1.5});
+        tree.insert(p0);
+        tree.insert(p1);
+        assert tree.root.octants[0].points.contains(p0);
+        assert tree.root.octants[6].points.contains(p1);
+    }
+
+    @Test
+    public void testExtendTree2() throws Exception {
+        Octree tree = new Octree();
+        BasicVector p0 = new BasicVector(new double[]{-0.5, 0.5, 0.5});
+        BasicVector p1 = new BasicVector(new double[]{4.5, -4.5, -4.5});
+        tree.insert(p0);
+        tree.insert(p1);
+        assert tree.root.octants[0].octants[0].points.contains(p0);
+        assert tree.root.octants[6].points.contains(p1);
+        assert tree.root.isLeaf == false;
+    }
 }
