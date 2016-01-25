@@ -1,26 +1,37 @@
 package Datastructures;
 
 import org.la4j.Vector;
-import org.la4j.vector.dense.BasicVector;
 
 public class MultiResolutionNode extends OctreeNode {
 
     int resolution = 128;
     Rasterization rasterization;
-    Vector exampleVector;
+    Point3DRGB exampleVector;
 
-    public MultiResolutionNode(BasicVector center, double cellLength, String dataKey) {
-        super(center, cellLength, dataKey);
+    public MultiResolutionNode() {
+        super();
         rasterization = new Rasterization(center, cellLength);
     }
 
-    public MultiResolutionNode(BasicVector center, double d) {
+    public MultiResolutionNode(Vector center, double cellLength, String dataKey) {
+        super(center, cellLength, dataKey);
+        rasterization = new Rasterization(center, cellLength);
+
+    }
+
+    public MultiResolutionNode(Vector center, double d) {
         super(center, d);
+        rasterization = new Rasterization(center, cellLength);
     }
 
     @Override
-    public void insert(BasicVector p) {
+    public void insert(Point3DRGB p) {
         super.insert(p);
-        rasterization.addToRaster(p);
+        if (exampleVector == null){
+            exampleVector = p;
+        }
+        if (this.isLeaf)
+            return;
+        rasterization.addToRaster(p.position);
     }
 }

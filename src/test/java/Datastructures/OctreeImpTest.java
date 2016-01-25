@@ -1,14 +1,21 @@
 package Datastructures;
 
+import junit.framework.TestCase;
+import org.junit.Before;
 import org.junit.Test;
-import org.la4j.vector.dense.BasicVector;
 
-public class OctreeTest {
+public class OctreeImpTest extends TestCase{
+    OctreeImp tree;
+
+    @Before
+    public void setUp() throws Exception {
+        tree = new OctreeImp();
+    }
+
 
     @Test
     public void testInsertToRoot() throws Exception {
-        Octree tree = new Octree();
-        BasicVector p = new BasicVector(new double[]{-0.3, 0.1 ,-0.3});
+        Point3DRGB p = new Point3DRGB(new double[]{-0.3, 0.1 ,-0.3});
         tree.insert(p);
         assert tree.root.isLeaf == true;
         assert tree.root.points.contains(p);
@@ -16,19 +23,18 @@ public class OctreeTest {
     }
 
     @Test
-    public void testInsert() throws Exception {
-        Octree tree = new Octree();
+    public void testAnsert() throws Exception {
         tree.root.createChildren();
         assert tree.root.isLeaf ==false;
 
-        BasicVector p0 = new BasicVector(new double[]{-0.3f, 0.1f ,0.3f});
-        BasicVector p1 = new BasicVector(new double[]{-0.3f, 0.1f ,-0.3f});
-        BasicVector p2 = new BasicVector(new double[]{0.3f, 0.1f ,-0.3f});
-        BasicVector p3 = new BasicVector(new double[]{0.3f, 0.1f ,0.7f});
-        BasicVector p4 = new BasicVector(new double[]{-0.3f, -0.1f ,0.3f});
-        BasicVector p5 = new BasicVector(new double[]{-0.3f, -0.1f ,-0.3f});
-        BasicVector p6 = new BasicVector(new double[]{0.3f, -0.1f ,-0.3f});
-        BasicVector p7 = new BasicVector(new double[]{0.3f, -0.1f ,0.7f});
+        Point3DRGB p0 = new Point3DRGB(new double[]{-0.3f, 0.1f ,0.3f});
+        Point3DRGB p1 = new Point3DRGB(new double[]{-0.3f, 0.1f ,-0.3f});
+        Point3DRGB p2 = new Point3DRGB(new double[]{0.3f, 0.1f ,-0.3f});
+        Point3DRGB p3 = new Point3DRGB(new double[]{0.3f, 0.1f ,0.5f});
+        Point3DRGB p4 = new Point3DRGB(new double[]{-0.3f, -0.1f ,0.3f});
+        Point3DRGB p5 = new Point3DRGB(new double[]{-0.3f, -0.1f ,-0.3f});
+        Point3DRGB p6 = new Point3DRGB(new double[]{0.3f, -0.1f ,-0.3f});
+        Point3DRGB p7 = new Point3DRGB(new double[]{0.3f, -0.1f ,0.5f});
         tree.insert(p0);
         tree.insert(p1);
         tree.insert(p2);
@@ -49,20 +55,18 @@ public class OctreeTest {
 
     @Test
     public void testExtendTree0() throws Exception {
-        Octree tree = new Octree();
-        BasicVector p0 = new BasicVector(new double[]{-0.5,0.5,0.5});
-        BasicVector p1 = new BasicVector(new double[]{-1.5,0.5,0.5});
+        Point3DRGB p0 = new Point3DRGB(new double[]{-0.5,0.5,0.5});
+        Point3DRGB p1 = new Point3DRGB(new double[]{-1.5,0.5,0.5});
         tree.insert(p0);
         tree.insert(p1);
-        assert tree.root.octants[5].points.contains(p1);
         assert tree.root.octants[6].points.contains(p0);
+        assert tree.root.octants[0].points.contains(p1);
     }
 
     @Test
     public void testExtendTree1() throws Exception {
-        Octree tree = new Octree();
-        BasicVector p0 = new BasicVector(new double[]{-0.5, 0.5, 0.5});
-        BasicVector p1 = new BasicVector(new double[]{1.5, -1.5, -1.5});
+        Point3DRGB p0 = new Point3DRGB(new double[]{-0.5, 0.5, 0.5});
+        Point3DRGB p1 = new Point3DRGB(new double[]{1.5, -1.5, -1.5});
         tree.insert(p0);
         tree.insert(p1);
         assert tree.root.octants[0].points.contains(p0);
@@ -71,12 +75,11 @@ public class OctreeTest {
 
     @Test
     public void testExtendTree2() throws Exception {
-        Octree tree = new Octree();
-        BasicVector p0 = new BasicVector(new double[]{-0.5, 0.5, 0.5});
-        BasicVector p1 = new BasicVector(new double[]{4.5, -4.5, -4.5});
+        Point3DRGB p0 = new Point3DRGB(new double[]{-0.5, 0.45, 0.45});
+        Point3DRGB p1 = new Point3DRGB(new double[]{4.4, -4.4, -4.4});
         tree.insert(p0);
         tree.insert(p1);
-        assert tree.root.octants[0].octants[0].points.contains(p0);
+        assert tree.root.octants[0].octants[0].octants[0].points.contains(p0);
         assert tree.root.octants[6].points.contains(p1);
         assert tree.root.isLeaf == false;
     }

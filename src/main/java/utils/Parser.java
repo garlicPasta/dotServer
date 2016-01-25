@@ -1,17 +1,42 @@
 package utils;
 
 
-import java.io.*;
-import java.nio.FloatBuffer;
+import Datastructures.Point3DRGB;
+import org.la4j.vector.dense.BasicVector;
 
-public abstract class Parser {
+import java.io.*;
+import java.util.Iterator;
+
+public abstract class Parser implements Iterable<Point3DRGB>{
+
+    private class PointIterator implements Iterator<Point3DRGB>{
+        int currentElement = 0;
+
+        @Override
+        public boolean hasNext() {
+            return currentElement < vertices.length;
+        }
+
+        @Override
+        public Point3DRGB next() {
+            Point3DRGB p =new Point3DRGB(new BasicVector(vertices[currentElement]),
+                    new BasicVector(colors[currentElement]));
+            currentElement++;
+            return p;
+        }
+    }
+
+    @Override
+    public Iterator<Point3DRGB> iterator() {
+        return new PointIterator();
+    }
 
     protected enum State{
         Header, Vertices
     }
 
-    protected float[][] vertices;
-    protected float[][] colors;
+    protected double[][] vertices;
+    protected double[][] colors;
     protected State parserState;
 
     public Parser(String fileName){
@@ -31,15 +56,15 @@ public abstract class Parser {
     }
 
     protected void createVertexArrays(int verticesCounter){
-        vertices = new float[verticesCounter][3];
-        colors = new float[verticesCounter][3];
+        vertices = new double[verticesCounter][3];
+        colors = new double[verticesCounter][3];
     }
 
-    public float[][] getVertices() {
+    public double[][] getVertices() {
         return vertices;
     }
 
-    public float[][] getColors() {
+    public double[][] getColors() {
         return colors;
     }
 

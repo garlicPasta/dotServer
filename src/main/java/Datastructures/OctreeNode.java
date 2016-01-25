@@ -1,5 +1,6 @@
 package Datastructures;
 
+import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
 import java.util.LinkedList;
@@ -10,12 +11,22 @@ public class OctreeNode{
     boolean isLeaf;
     double cellLength;
     String dataKey;
-    BasicVector center;
+    Vector center;
     int pointCount;
-    List<BasicVector> points = new LinkedList<>();
+    int maxPoints;
+    List<Point3DRGB> points = new LinkedList<>();
     OctreeNode[] octants;
 
-    public OctreeNode(BasicVector center, double d, String dataKey) {
+    public OctreeNode(){
+        this.center = new BasicVector(new double[3]);
+        this.cellLength = 1;
+        this.dataKey = null;
+        this.pointCount = 0;
+        this.isLeaf = true;
+        octants= new OctreeNode[8];
+    }
+
+    public OctreeNode(Vector center, double d, String dataKey) {
         this.center = center;
         this.cellLength = d;
         this.dataKey = dataKey;
@@ -24,25 +35,33 @@ public class OctreeNode{
         octants= new OctreeNode[8];
     }
 
-    public OctreeNode(BasicVector center, double d) {
+    public OctreeNode(Vector center, double d) {
         this(center, d, center.toString());
     }
 
-    public void insert(BasicVector p){
+    public void insert(Point3DRGB p){
         if (this.isLeaf){
-            pointCount++;
-            addPointToDataBase(p);
-            points.add(p);
+            if (pointCount++ > maxPoints ){
+                this.isLeaf = false;
+                this.createChildren();
+                for (Point3DRGB v : points){
+                    this.insert(v);
+                }
+                points = null;
+            } else {
+                addPointToDataBase(p);
+                points.add(p);
+            }
             return;
         }
-        int octant_index = determineOctant(p);
+        int octant_index = determineOctant(p.position);
         octants[octant_index].insert(p);
     }
 
     public void createChildren(){
         this.isLeaf = false;
         for (int i=0; i<8; i++){
-            BasicVector p = calculateNodeCenter(i);
+            Vector p = calculateNodeCenter(i);
             octants[i] = new OctreeNode(p, cellLength /2, p.toString());
         }
     }
@@ -52,7 +71,7 @@ public class OctreeNode{
      * @return BasicVector
      * Function returns the center point of a child
      */
-    public BasicVector calculateNodeCenter(int octant_index){
+    public Vector calculateNodeCenter(int octant_index){
         double d = cellLength / 4;
         double u=1;
         BasicVector c;
@@ -82,7 +101,7 @@ public class OctreeNode{
      * @return
      * Returns the octant index which contains the point p
      */
-    public int determineOctant(BasicVector p){
+    public int determineOctant(Vector p){
         int offset=0;
         if (center.get(1) > p.get(1)){
             offset=4;
@@ -98,7 +117,7 @@ public class OctreeNode{
         throw new IllegalArgumentException("Point is not member of the octant");
     }
 
-    public void addPointToDataBase(BasicVector p){}
+    public void addPointToDataBase(Point3DRGB p){}
 
     public int inverseOctant(int octant_index){
         switch(octant_index){
@@ -154,11 +173,12 @@ public class OctreeNode{
         }
     }
 
-    public boolean isInBoundingBox(BasicVector p){
+
+    public boolean isInBoundingBox(Vector p){
         double cellLength = this.cellLength/2;
-        return  ((center.get(0) + cellLength) > p.get(0)) && ((center.get(0) - cellLength) <  p.get(0)) &&
-                ((center.get(1) + cellLength) > p.get(1)) && ((center.get(1) - cellLength) <  p.get(1)) &&
-                ((center.get(2) + cellLength) > p.get(2)) && ((center.get(2) - cellLength) <  p.get(2));
+        return  ((center.get(0) + cellLength) >= p.get(0)) && ((center.get(0) - cellLength) <=  p.get(0)) &&
+                ((center.get(1) + cellLength) >= p.get(1)) && ((center.get(1) - cellLength) <=  p.get(1)) &&
+                ((center.get(2) + cellLength) >= p.get(2)) && ((center.get(2) - cellLength) <=  p.get(2));
     }
 }
 

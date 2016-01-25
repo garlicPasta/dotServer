@@ -3,7 +3,7 @@ package Datastructures;
 import org.junit.Test;
 import org.la4j.vector.dense.BasicVector;
 
-public class OctreeNodeTest {
+public class OctreeImpNodeTest {
 
     @Test
     public void testCalculateNodeCenter() throws Exception {
