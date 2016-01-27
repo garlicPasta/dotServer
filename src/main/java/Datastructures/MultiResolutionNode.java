@@ -16,7 +16,6 @@ public class MultiResolutionNode extends OctreeNode {
     public MultiResolutionNode(Vector center, double cellLength, String dataKey) {
         super(center, cellLength, dataKey);
         rasterization = new Rasterization(center, cellLength);
-
     }
 
     public MultiResolutionNode(Vector center, double d) {
@@ -29,6 +28,7 @@ public class MultiResolutionNode extends OctreeNode {
         super.insert(p);
         if (exampleVector == null){
             exampleVector = p;
+            rasterization.setColors(p.color);
         }
         if (this.isLeaf)
             return;

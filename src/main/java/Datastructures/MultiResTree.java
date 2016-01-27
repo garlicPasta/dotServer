@@ -2,8 +2,11 @@ package Datastructures;
 
 
 import org.la4j.Vector;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class MultiResTree extends OctreeImp {
 
@@ -77,5 +80,45 @@ public class MultiResTree extends OctreeImp {
             max.add(_getDepth(n.octants[0]) + 1);
         }
         return Collections.max(max);
+    }
+
+    /**
+     * @param level
+     * @return
+     * Returns iterates over all nodes in a certain level
+     */
+    public Iterator<MultiResolutionNode> iterateSampleLevel(int level){
+        return new Iterator<MultiResolutionNode>() {
+            MultiResolutionNode currentNode;
+            LinkedList<MultiResolutionNode> stack;
+            LinkedList<Point3DRGB> points;
+            {
+                currentNode = root;
+                stack = new LinkedList<>();
+                fillUpStack(root, level);
+            }
+
+            private void fillUpStack(MultiResolutionNode node , int level) {
+                if (node == null) {
+                    return;
+                }
+                if (level == 0 ){
+                    stack.add(node);
+                }
+                for (int i = 0; i < 8 ; i++) {
+                    fillUpStack((MultiResolutionNode) node.octants[i], level -1);
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                return !stack.isEmpty();
+            }
+
+            @Override
+            public MultiResolutionNode next() {
+                return stack.pop();
+            }
+        };
     }
 }

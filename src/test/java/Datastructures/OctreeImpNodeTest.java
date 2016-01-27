@@ -7,7 +7,6 @@ public class OctreeImpNodeTest {
 
     @Test
     public void testCalculateNodeCenter() throws Exception {
-
     }
 
     @Test

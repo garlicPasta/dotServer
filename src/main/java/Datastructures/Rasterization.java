@@ -4,9 +4,12 @@ package Datastructures;
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
+import java.util.Formatter;
+
 public class Rasterization {
 
     Vector zeroVector;
+    Vector colors;
     int rasterSize;
     double rasterStep;
     int[][][] raster;
@@ -53,5 +56,37 @@ public class Rasterization {
 
     public int[][][] getRaster() {
         return raster;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Formatter f = new Formatter(sb);
+        double x = zeroVector.get(0);
+        double y = zeroVector.get(1);
+        double z = zeroVector.get(2);
+
+        for (int i = 0; i < rasterSize ; i++) {
+            for (int j = 0; j < rasterSize; j++) {
+                for (int k = 0; k < rasterSize; k++) {
+                    if (raster[i][j][k] > 0 ){
+                        f.format("%f %f %f %f %f %f %d",
+                                x+i*rasterStep, y+j*rasterStep, z+k*rasterStep,
+                                colors.get(0), colors.get(1), colors.get(2),
+                                raster[i][j][k]);
+                        sb.append('\n');
+                    }
+                }
+            }
+        }
+        return f.toString();
+    }
+
+    public Vector getColors() {
+        return colors;
+    }
+
+    public void setColors(Vector colors) {
+        this.colors = colors;
     }
 }
