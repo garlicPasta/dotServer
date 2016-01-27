@@ -54,6 +54,7 @@ public class OctreeNode{
             }
             return;
         }
+        assert this.isInBoundingBox(p.position);
         int octant_index = determineOctant(p.position);
         octants[octant_index].insert(p);
     }
@@ -85,10 +86,10 @@ public class OctreeNode{
                 c = new BasicVector(new double[]{center.get(0) - d, center.get(1) + u*d, center.get(2) - d });
                 break;
             case 2:
-                c = new BasicVector(new double[]{center.get(0) + d, center.get(1) + u*d, center.get(2) + d });
+                c = new BasicVector(new double[]{center.get(0) + d, center.get(1) + u*d, center.get(2) - d });
                 break;
             case 3:
-                c = new BasicVector(new double[]{center.get(0) - d, center.get(1) + u*d, center.get(2) + d });
+                c = new BasicVector(new double[]{center.get(0) + d, center.get(1) + u*d, center.get(2) + d });
                 break;
             default:
                 throw new IllegalArgumentException();

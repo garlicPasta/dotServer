@@ -8,7 +8,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class MultiResTree extends OctreeImp {
+public class MultiResTree{
+
+    double rootLength = 1.0d; // Shortest distance from zeroVector to border
+    int totalInserts;
 
     MultiResolutionNode root;
 
@@ -41,7 +44,7 @@ public class MultiResTree extends OctreeImp {
     }
 
     private int[] getOctantOffset(int index){
-        int halfOffset = root.rasterization.rasterSize / 2;
+        int halfOffset = Rasterization.rasterSize / 2;
         int m = index > 3 ? halfOffset: 0;
 
         if (index % 4 == 0) {

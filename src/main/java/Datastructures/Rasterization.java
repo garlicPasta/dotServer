@@ -10,14 +10,15 @@ public class Rasterization {
 
     Vector zeroVector;
     Vector colors;
-    int rasterSize;
+    public static final int rasterSize = 128;
     double rasterStep;
+    double cellLength;
     int[][][] raster;
 
     public Rasterization(Vector center, double cellLength){
         this.zeroVector = center.subtract(cellLength / 2);
-        this.rasterSize = 128;
         this.rasterStep = cellLength / 128;
+        this.cellLength = cellLength;
         this.raster = new int[rasterSize][rasterSize][rasterSize];
     }
 

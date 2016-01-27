@@ -4,8 +4,7 @@ import org.la4j.Vector;
 
 public class MultiResolutionNode extends OctreeNode {
 
-    int resolution = 128;
-    Rasterization rasterization;
+    public Rasterization rasterization;
     Point3DRGB exampleVector;
 
     public MultiResolutionNode() {
@@ -32,6 +31,16 @@ public class MultiResolutionNode extends OctreeNode {
         }
         if (this.isLeaf)
             return;
+        assert this.isInBoundingBox(p.position);
         rasterization.addToRaster(p.position);
+    }
+
+    @Override
+    public void createChildren() {
+        this.isLeaf = false;
+        for (int i=0; i<8; i++){
+            Vector p = calculateNodeCenter(i);
+            octants[i] = new MultiResolutionNode(p, cellLength /2, p.toString());
+        }
     }
 }
