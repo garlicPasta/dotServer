@@ -2,7 +2,10 @@ package Datastructures;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.internal.InexactComparisonCriteria;
 import utils.NvmParser;
+
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
@@ -20,16 +23,10 @@ public class MultiResTreeTest {
     }
 
     @Test
-    public void testInsert(){
+    public void testInsertRoot(){
         int sum = 0;
-        int [][][] raster = mt.root.rasterization.raster;
-        for (int i = 0; i < raster.length ; i++) {
-            for (int j = 0; j < raster.length ; j++) {
-                for (int k = 0; k < raster.length ; k++) {
-                    sum += raster[i][j][k];
-                }
-            }
-        }
-        assertEquals( mt.totalInserts , sum);
+        for (Integer i : mt.root.rasterization.getRaster().values())
+            sum += i;
+        assertEquals( mt.totalInserts, sum);
     }
 }

@@ -12,7 +12,6 @@ public class OctreeNode{
     double cellLength;
     String dataKey;
     Vector center;
-    int pointCount;
     int maxPoints;
     List<Point3DRGB> points = new LinkedList<>();
     OctreeNode[] octants;
@@ -21,7 +20,6 @@ public class OctreeNode{
         this.center = new BasicVector(new double[3]);
         this.cellLength = 1;
         this.dataKey = null;
-        this.pointCount = 0;
         this.isLeaf = true;
         octants= new OctreeNode[8];
     }
@@ -30,7 +28,6 @@ public class OctreeNode{
         this.center = center;
         this.cellLength = d;
         this.dataKey = dataKey;
-        this.pointCount = 0;
         this.isLeaf = true;
         octants= new OctreeNode[8];
     }
@@ -41,11 +38,11 @@ public class OctreeNode{
 
     public void insert(Point3DRGB p){
         if (this.isLeaf){
-            if (pointCount++ > maxPoints ){
+            if (points.size() > maxPoints ){
                 this.isLeaf = false;
                 this.createChildren();
                 for (Point3DRGB v : points){
-                    this.insert(v);
+                    insert(v);
                 }
                 points = null;
             } else {
@@ -54,7 +51,6 @@ public class OctreeNode{
             }
             return;
         }
-        assert this.isInBoundingBox(p.position);
         int octant_index = determineOctant(p.position);
         octants[octant_index].insert(p);
     }

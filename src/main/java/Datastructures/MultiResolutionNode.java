@@ -31,7 +31,6 @@ public class MultiResolutionNode extends OctreeNode {
         }
         if (this.isLeaf)
             return;
-        assert this.isInBoundingBox(p.position);
         rasterization.addToRaster(p.position);
     }
 

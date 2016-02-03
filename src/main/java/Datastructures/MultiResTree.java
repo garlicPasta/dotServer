@@ -2,11 +2,9 @@ package Datastructures;
 
 
 import org.la4j.Vector;
+import org.la4j.vector.dense.BasicVector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class MultiResTree{
 
@@ -38,34 +36,34 @@ public class MultiResTree{
 
         int newIndex = newRoot.determineOctant(root.center);
         newRoot.octants[newIndex] = root;
-        int[] offset = getOctantOffset(newIndex);
+        Vector offset = getOctantOffset(newIndex);
         stamp3dArray(newRoot.rasterization.getRaster(), root.rasterization.getDownSampledRaster(), offset);
         return newRoot;
     }
 
-    private int[] getOctantOffset(int index){
+    /**
+     * @param index
+     * @return
+     * Returns first vector for stamping.
+     */
+    private Vector getOctantOffset(int index){
         int halfOffset = Rasterization.rasterSize / 2;
         int m = index > 3 ? halfOffset: 0;
 
         if (index % 4 == 0) {
-            return new int[]{m, 0, 0};
+            return new BasicVector(new double[]{m, 0, 0});
         } else if (index % 4 == 1) {
-            return new int[]{m, 0, halfOffset};
+            return new BasicVector(new double[]{m, 0, halfOffset});
         } else if (index % 4 == 2) {
-            return new int[]{m, halfOffset, halfOffset};
+            return new BasicVector(new double[]{m, halfOffset, halfOffset});
         }
-        return new int[]{m, halfOffset, 0};
+        return new BasicVector(new double[]{m, halfOffset, 0});
     }
 
-    private void stamp3dArray(int[][][] base, int[][][] pattern, int []offset) {
-        for (int i = 0; i < pattern.length; i++) {
-            for (int j = 0; j < pattern.length; j++) {
-                for (int k = 0; k < pattern.length; k++) {
-                    base[ i + offset[0] ][ j + offset[1] ][ k + offset[2] ] = pattern[i][j][k];
-                }
-            }
+    private void stamp3dArray(Map<Vector, Integer> base, Map<Vector, Integer> pattern, Vector offset) {
+        for (Map.Entry<Vector, Integer> rasterPoint : pattern.entrySet()) {
+            base.put(rasterPoint.getKey().add(offset), rasterPoint.getValue());
         }
-
     }
 
     public Integer getDepth(){

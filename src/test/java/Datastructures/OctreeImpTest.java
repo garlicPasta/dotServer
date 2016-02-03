@@ -19,7 +19,7 @@ public class OctreeImpTest extends TestCase{
         tree.insert(p);
         assert tree.root.isLeaf == true;
         assert tree.root.points.contains(p);
-        assert tree.root.pointCount == 1;
+        assert tree.root.points.size() == 1;
     }
 
     @Test
