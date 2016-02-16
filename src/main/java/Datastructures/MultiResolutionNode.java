@@ -42,4 +42,9 @@ public class MultiResolutionNode extends OctreeNode {
             octants[i] = new MultiResolutionNode(p, cellLength /2, p.toString());
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

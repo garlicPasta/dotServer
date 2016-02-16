@@ -3,6 +3,8 @@ package Datastructures;
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class OctreeNode{
     int maxPoints;
     List<Point3DRGB> points = new LinkedList<>();
     OctreeNode[] octants;
+
 
     public OctreeNode(){
         this.center = new BasicVector(new double[3]);
@@ -176,6 +179,16 @@ public class OctreeNode{
         return  ((center.get(0) + cellLength) >= p.get(0)) && ((center.get(0) - cellLength) <=  p.get(0)) &&
                 ((center.get(1) + cellLength) >= p.get(1)) && ((center.get(1) - cellLength) <=  p.get(1)) &&
                 ((center.get(2) + cellLength) >= p.get(2)) && ((center.get(2) - cellLength) <=  p.get(2));
+    }
+
+    public String toString() {
+        return toJson().toString();
+    }
+
+    public  JsonObject toJson(){
+        return Json.createObjectBuilder().add("center", center.toString())
+                .add("cellLength", String.valueOf(cellLength))
+                .add("isLeaf", String.valueOf(String.valueOf(isLeaf))).build();
     }
 }
 

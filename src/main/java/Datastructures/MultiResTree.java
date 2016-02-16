@@ -105,6 +105,7 @@ public class MultiResTree{
                 }
                 if (level == 0 ){
                     stack.add(node);
+                    return;
                 }
                 for (int i = 0; i < 8 ; i++) {
                     fillUpStack((MultiResolutionNode) node.octants[i], level -1);
