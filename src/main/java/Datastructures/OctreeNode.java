@@ -5,32 +5,35 @@ import org.la4j.vector.dense.BasicVector;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class OctreeNode{
 
+    public static int MAXPOINTS = 1000;
+
     boolean isLeaf;
     double cellLength;
-    String dataKey;
     Vector center;
-    int maxPoints;
+    String id;
     List<Point3DRGB> points = new LinkedList<>();
     OctreeNode[] octants;
-
+    Map<String, OctreeNode > index;
+    protected int pointCount;
 
     public OctreeNode(){
         this.center = new BasicVector(new double[3]);
         this.cellLength = 1;
-        this.dataKey = null;
         this.isLeaf = true;
         octants= new OctreeNode[8];
     }
 
-    public OctreeNode(Vector center, double d, String dataKey) {
+    public OctreeNode(Vector center, double d, String id) {
         this.center = center;
         this.cellLength = d;
-        this.dataKey = dataKey;
+        this.id = id.replaceAll("\\s+","");
         this.isLeaf = true;
         octants= new OctreeNode[8];
     }
@@ -41,7 +44,7 @@ public class OctreeNode{
 
     public void insert(Point3DRGB p){
         if (this.isLeaf){
-            if (points.size() > maxPoints ){
+            if (++pointCount > MAXPOINTS ){
                 this.isLeaf = false;
                 this.createChildren();
                 for (Point3DRGB v : points){
@@ -49,20 +52,20 @@ public class OctreeNode{
                 }
                 points = null;
             } else {
-                addPointToDataBase(p);
                 points.add(p);
+                return;
             }
-            return;
         }
         int octant_index = determineOctant(p.position);
         octants[octant_index].insert(p);
     }
 
-    public void createChildren(){
+    public void createChildren() {
         this.isLeaf = false;
         for (int i=0; i<8; i++){
             Vector p = calculateNodeCenter(i);
-            octants[i] = new OctreeNode(p, cellLength /2, p.toString());
+            octants[i] = new MultiResolutionNode(p, cellLength /2);
+            octants[i].index = index;
         }
     }
 
@@ -116,8 +119,6 @@ public class OctreeNode{
             return 3 + offset;
         throw new IllegalArgumentException("Point is not member of the octant");
     }
-
-    public void addPointToDataBase(Point3DRGB p){}
 
     public int inverseOctant(int octant_index){
         switch(octant_index){
@@ -175,20 +176,41 @@ public class OctreeNode{
 
 
     public boolean isInBoundingBox(Vector p){
-        double cellLength = this.cellLength/2;
+        double cellLength = this.cellLength / 2;
         return  ((center.get(0) + cellLength) >= p.get(0)) && ((center.get(0) - cellLength) <=  p.get(0)) &&
                 ((center.get(1) + cellLength) >= p.get(1)) && ((center.get(1) - cellLength) <=  p.get(1)) &&
                 ((center.get(2) + cellLength) >= p.get(2)) && ((center.get(2) - cellLength) <=  p.get(2));
     }
 
+    @Override
     public String toString() {
         return toJson().toString();
     }
 
     public  JsonObject toJson(){
-        return Json.createObjectBuilder().add("center", center.toString())
+        return toJsonBuilder().build();
+    }
+
+    protected JsonObjectBuilder toJsonBuilder(){
+        JsonObjectBuilder jB = Json.createObjectBuilder()
+                .add("center", center.toString())
                 .add("cellLength", String.valueOf(cellLength))
-                .add("isLeaf", String.valueOf(String.valueOf(isLeaf))).build();
+                .add("isLeaf", String.valueOf(isLeaf));
+        if (!isLeaf)
+                jB.add("children", childrenToJson());
+        return jB;
+    }
+
+    private JsonObject childrenToJson() {
+        JsonObjectBuilder jB = Json.createObjectBuilder();
+
+        if(octants[0] == null)
+            return jB.build();
+
+        for (int i=0; i < 8 ; i++) {
+            jB.add(Integer.toString(i), octants[i].id);
+        }
+        return jB.build();
     }
 }
 

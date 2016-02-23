@@ -2,6 +2,9 @@ package Datastructures;
 
 import org.la4j.Vector;
 
+import javax.json.JsonObjectBuilder;
+import java.util.Map;
+
 public class MultiResolutionNode extends OctreeNode {
 
     public Rasterization rasterization;
@@ -12,35 +15,31 @@ public class MultiResolutionNode extends OctreeNode {
         rasterization = new Rasterization(center, cellLength);
     }
 
-    public MultiResolutionNode(Vector center, double cellLength, String dataKey) {
-        super(center, cellLength, dataKey);
+    public MultiResolutionNode(Vector center, double cellLength, String id) {
+        super(center, cellLength, id);
         rasterization = new Rasterization(center, cellLength);
     }
 
     public MultiResolutionNode(Vector center, double d) {
-        super(center, d);
+        super(center, d, center.toString());
         rasterization = new Rasterization(center, cellLength);
     }
 
     @Override
     public void insert(Point3DRGB p) {
         super.insert(p);
-        if (exampleVector == null){
-            exampleVector = p;
-            rasterization.setColors(p.color);
-        }
         if (this.isLeaf)
             return;
-        rasterization.addToRaster(p.position);
+        rasterization.addToRaster(p);
     }
 
+
     @Override
-    public void createChildren() {
-        this.isLeaf = false;
-        for (int i=0; i<8; i++){
-            Vector p = calculateNodeCenter(i);
-            octants[i] = new MultiResolutionNode(p, cellLength /2, p.toString());
-        }
+    public JsonObjectBuilder toJsonBuilder(){
+        JsonObjectBuilder jB = super.toJsonBuilder();
+        jB.add("pointCount", this.pointCount);
+        return jB;
+
     }
 
     @Override

@@ -20,7 +20,6 @@ public class ApiController extends NanoHTTPD {
     public ApiController(int port, MultiResTree mrt) throws IOException {
         super(port);
         this.mrt = mrt;
-        fillUpMap();
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         System.out.println("\nRunning! Point your browers to http://localhost:8080/ \n");
     }
@@ -28,12 +27,25 @@ public class ApiController extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         Map<String, String> params = session.getParms();
-        String key =  params.get("depth") + " " + params.get("node") + " " + params.get("page");
-        if (map.containsKey(key)){
-            return NanoHTTPD.newFixedLengthResponse(map.get(key));
+        switch (params.get("mode")){
+            case "tree":
+                String nodeId =  params.get("id");
+                if (nodeId == null)
+                    return  NanoHTTPD.newFixedLengthResponse(mrt.toString());
+                if (mrt.index.containsKey(nodeId))
+                    return  NanoHTTPD.newFixedLengthResponse(mrt.index.get(nodeId).toString());
+                return NanoHTTPD.newFixedLengthResponse("null");
+
+            case "samples":
+                String key =  params.get("depth") + " " + params.get("node") + " " + params.get("page");
+                if (map.containsKey(key)){
+                    return NanoHTTPD.newFixedLengthResponse(map.get(key));
+                }
+                return NanoHTTPD.newFixedLengthResponse("Invalid Parameters \n depth:" + params.get("depth")
+                        + "\n node:" + params.get("node"));
+            default:
+                return NanoHTTPD.newFixedLengthResponse("Invalid Mode");
         }
-        return NanoHTTPD.newFixedLengthResponse("Invalid Parameters \n depth:" + params.get("depth")
-                + "\n num:" + params.get("num"));
     }
 
     public void fillUpMap() throws IOException {

@@ -1,5 +1,6 @@
 package Datastructures;
 
+import org.javatuples.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.InexactComparisonCriteria;
@@ -24,9 +25,9 @@ public class MultiResTreeTest {
 
     @Test
     public void testInsertRoot(){
-        int sum = 0;
-        for (Integer i : mt.root.rasterization.getRaster().values())
-            sum += i;
-        assertEquals( mt.totalInserts, sum);
+        Integer sum = 0;
+        for (Pair<double[], Integer> p : mt.root.rasterization.getRaster().values())
+            sum += p.getValue1();
+        assertEquals( new Integer(mt.totalInserts), sum);
     }
 }

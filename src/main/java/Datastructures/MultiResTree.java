@@ -1,6 +1,7 @@
 package Datastructures;
 
 
+import org.javatuples.Pair;
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
@@ -11,11 +12,15 @@ public class MultiResTree{
     double rootLength = 1.0d; // Shortest distance from zeroVector to border
     int totalInserts;
 
+    public Map<String, OctreeNode> index;
+
     MultiResolutionNode root;
 
     public MultiResTree() {
         super();
         this.root = new MultiResolutionNode();
+        index = new HashMap<>();
+        this.root.index = index;
     }
 
     public void insert(Point3DRGB p) {
@@ -41,6 +46,27 @@ public class MultiResTree{
         return newRoot;
     }
 
+    @Override
+    public String toString(){
+        return root.toString();
+    }
+
+    public void createIndex(){
+         _createIndex(root);
+    }
+
+    private void _createIndex(OctreeNode n){
+        if (n == null) {
+            return;
+        }
+        index.put(n.id, n);
+
+        for (int i=0; i <8; i++){
+            _createIndex(n.octants[i]);
+        }
+    }
+
+
     /**
      * @param index
      * @return
@@ -60,8 +86,9 @@ public class MultiResTree{
         return new BasicVector(new double[]{m, halfOffset, 0});
     }
 
-    private void stamp3dArray(Map<Vector, Integer> base, Map<Vector, Integer> pattern, Vector offset) {
-        for (Map.Entry<Vector, Integer> rasterPoint : pattern.entrySet()) {
+    private void stamp3dArray(Map<Vector, Pair<double[], Integer>> base,
+                              Map<Vector, Pair<double[], Integer>> pattern, Vector offset) {
+        for (Map.Entry<Vector, Pair<double[], Integer>> rasterPoint : pattern.entrySet()) {
             base.put(rasterPoint.getKey().add(offset), rasterPoint.getValue());
         }
     }
@@ -78,7 +105,7 @@ public class MultiResTree{
         ArrayList<Integer> max = new ArrayList<>();
 
         for (int i=0; i <8; i++){
-            max.add(_getDepth(n.octants[0]) + 1);
+            max.add(_getDepth(n.octants[i]) + 1);
         }
         return Collections.max(max);
     }

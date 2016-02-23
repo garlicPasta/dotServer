@@ -25,6 +25,8 @@ public class App {
             mt.insert(p);
         }
 
+        mt.createIndex();
+
         ac = new ApiController(PORT, mt);
 
 
