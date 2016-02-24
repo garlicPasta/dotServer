@@ -14,20 +14,17 @@ public class OctreeNode{
 
     public static int MAXPOINTS = 1000;
 
-    boolean isLeaf;
-    double cellLength;
-    Vector center;
-    String id;
+    public boolean isLeaf;
+    public double cellLength;
+    public Vector center;
+    public String id;
     List<Point3DRGB> points = new LinkedList<>();
-    OctreeNode[] octants;
+    public OctreeNode[] octants;
     Map<String, OctreeNode > index;
-    protected int pointCount;
+    public int pointCount;
 
     public OctreeNode(){
-        this.center = new BasicVector(new double[3]);
-        this.cellLength = 1;
-        this.isLeaf = true;
-        octants= new OctreeNode[8];
+        this(new BasicVector(new double[3]), 1);
     }
 
     public OctreeNode(Vector center, double d, String id) {
@@ -64,7 +61,7 @@ public class OctreeNode{
         this.isLeaf = false;
         for (int i=0; i<8; i++){
             Vector p = calculateNodeCenter(i);
-            octants[i] = new MultiResolutionNode(p, cellLength /2);
+            octants[i] = new MultiResolutionNode(p, cellLength / 2);
             octants[i].index = index;
         }
     }

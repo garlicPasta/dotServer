@@ -13,8 +13,11 @@ public class MultiResTree{
     int totalInserts;
 
     public Map<String, OctreeNode> index;
-
     MultiResolutionNode root;
+
+    public MultiResolutionNode getRoot() {
+        return root;
+    }
 
     public MultiResTree() {
         super();
