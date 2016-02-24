@@ -9,7 +9,7 @@ import java.util.*;
 
 public class MultiResTree{
 
-    double rootLength = 1.0d; // Shortest distance from zeroVector to border
+    double rootLength = 1.0d; // Length of the root octant
     int totalInserts;
 
     public Map<String, OctreeNode> index;
@@ -45,7 +45,7 @@ public class MultiResTree{
         int newIndex = newRoot.determineOctant(root.center);
         newRoot.octants[newIndex] = root;
         Vector offset = getOctantOffset(newIndex);
-        stamp3dArray(newRoot.rasterization.getRaster(), root.rasterization.getDownSampledRaster(), offset);
+        stamp3dArray(newRoot.raster.getRaster(), root.raster.getDownSampledRaster(), offset);
         return newRoot;
     }
 
@@ -76,7 +76,7 @@ public class MultiResTree{
      * Returns first vector for stamping.
      */
     private Vector getOctantOffset(int index){
-        int halfOffset = Rasterization.rasterSize / 2;
+        int halfOffset = Raster.rasterSize / 2;
         int m = index > 3 ? halfOffset: 0;
 
         if (index % 4 == 0) {
@@ -89,9 +89,9 @@ public class MultiResTree{
         return new BasicVector(new double[]{m, halfOffset, 0});
     }
 
-    private void stamp3dArray(Map<Vector, Pair<double[], Integer>> base,
-                              Map<Vector, Pair<double[], Integer>> pattern, Vector offset) {
-        for (Map.Entry<Vector, Pair<double[], Integer>> rasterPoint : pattern.entrySet()) {
+    private void stamp3dArray(Map<Vector, Pair<int[], Integer>> base,
+                              Map<Vector, Pair<int[], Integer>> pattern, Vector offset) {
+        for (Map.Entry<Vector, Pair<int[], Integer>> rasterPoint : pattern.entrySet()) {
             base.put(rasterPoint.getKey().add(offset), rasterPoint.getValue());
         }
     }

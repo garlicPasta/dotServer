@@ -41,7 +41,7 @@ public class NvmParser extends Parser {
                 String[] list = line.split(" ");
                 for(int i=0; i < 3 ; i++) {
                     vertices[verticesCounter][i] = Float.valueOf(list[i]);
-                    colors[verticesCounter][i] = Float.valueOf(list[3 + i])/255;
+                    colors[verticesCounter][i] = Integer.valueOf(list[3 + i]);
                 }
             }
             return;

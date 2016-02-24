@@ -3,26 +3,25 @@ package Datastructures;
 import org.la4j.Vector;
 
 import javax.json.JsonObjectBuilder;
-import java.util.Map;
 
 public class MultiResolutionNode extends OctreeNode {
 
-    public Rasterization rasterization;
+    public Raster raster;
     Point3DRGB exampleVector;
 
     public MultiResolutionNode() {
         super();
-        rasterization = new Rasterization(center, cellLength);
+        raster = new Raster(center, cellLength);
     }
 
     public MultiResolutionNode(Vector center, double cellLength, String id) {
         super(center, cellLength, id);
-        rasterization = new Rasterization(center, cellLength);
+        raster = new Raster(center, cellLength);
     }
 
     public MultiResolutionNode(Vector center, double d) {
         super(center, d, center.toString());
-        rasterization = new Rasterization(center, cellLength);
+        raster = new Raster(center, cellLength);
     }
 
     @Override
@@ -30,7 +29,7 @@ public class MultiResolutionNode extends OctreeNode {
         super.insert(p);
         if (this.isLeaf)
             return;
-        rasterization.addToRaster(p);
+        raster.addToRaster(p);
     }
 
 

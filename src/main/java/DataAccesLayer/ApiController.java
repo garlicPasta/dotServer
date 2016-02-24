@@ -1,8 +1,13 @@
 package DataAccesLayer;
 
 import Datastructures.MultiResTree;
+import Datastructures.MultiResolutionNode;
 import Datastructures.OctreeNode;
+import Datastructures.Raster;
 import fi.iki.elonen.NanoHTTPD;
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
+import org.la4j.Vector;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,14 +16,13 @@ import java.util.Map;
 
 public class ApiController extends NanoHTTPD {
 
-    final static int PAGE_SIZE = 1000;
-
     MultiResTree mrt = new MultiResTree();
-    HashMap<String, String> map = new HashMap<>();
+    Map<String, OctreeNode> map = new HashMap<>();
 
     public ApiController(int port, MultiResTree mrt) throws IOException {
         super(port);
         this.mrt = mrt;
+        map = mrt.index;
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         System.out.println("\nRunning! Point your browers to http://localhost:8080/ \n Keep going Jakob!");
     }
@@ -32,9 +36,13 @@ public class ApiController extends NanoHTTPD {
                 return  NanoHTTPD.newFixedLengthResponse(Response.Status.OK,"application/octet-stream",
                         new ByteArrayInputStream(protobuf), protobuf.length);
             case "samples":
-                String key =  params.get("depth") + " " + params.get("node") + " " + params.get("page");
+                String key =  params.get("id");
                 if (map.containsKey(key)){
-                    return NanoHTTPD.newFixedLengthResponse(map.get(key));
+                    //return NanoHTTPD.newFixedLengthResponse(map.get(key).toString());
+                    MultiResolutionNode n = (MultiResolutionNode) map.get(key);
+                    byte[] protobufRaster = buildRasterProto(n.raster).toByteArray();
+                    return  NanoHTTPD.newFixedLengthResponse(Response.Status.OK,"application/octet-stream",
+                            new ByteArrayInputStream(protobufRaster), protobufRaster.length);
                 }
                 return NanoHTTPD.newFixedLengthResponse("Invalid Parameters \n depth:" + params.get("depth")
                         + "\n node:" + params.get("node"));
@@ -62,8 +70,24 @@ public class ApiController extends NanoHTTPD {
                 b.addOctant(i, _buildMRTProto(MultiResTreeProtos.MRTree.MRNode.newBuilder(), node.octants[i]));
             }
         }
+
         return b.build();
     }
+
+    static private RasterProtos.Raster buildRasterProto(Raster r){
+        RasterProtos.Raster.Builder b = RasterProtos.Raster.newBuilder();
+        for (Triplet<double[], int[], Integer> t: r){
+            RasterProtos.Raster.Point3DRGB.Builder bP = RasterProtos.Raster.Point3DRGB.newBuilder();
+            for (int i = 0; i < 3; i++) {
+                bP.addPosition(t.getValue0()[i]);
+                bP.addColor(t.getValue1()[i]);
+            }
+            bP.setSize(t.getValue2());
+            b.addSample(bP);
+        }
+        return b.build();
+    }
+
 
 
 }

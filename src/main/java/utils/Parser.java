@@ -20,7 +20,7 @@ public abstract class Parser implements Iterable<Point3DRGB>{
         @Override
         public Point3DRGB next() {
             Point3DRGB p =new Point3DRGB(new BasicVector(vertices[currentElement]),
-                    new BasicVector(colors[currentElement]));
+                    colors[currentElement]);
             currentElement++;
             return p;
         }
@@ -36,7 +36,7 @@ public abstract class Parser implements Iterable<Point3DRGB>{
     }
 
     protected double[][] vertices;
-    protected double[][] colors;
+    protected int[][] colors;
     protected State parserState;
 
     public Parser(String fileName){
@@ -57,14 +57,14 @@ public abstract class Parser implements Iterable<Point3DRGB>{
 
     protected void createVertexArrays(int verticesCounter){
         vertices = new double[verticesCounter][3];
-        colors = new double[verticesCounter][3];
+        colors = new int[verticesCounter][3];
     }
 
     public double[][] getVertices() {
         return vertices;
     }
 
-    public double[][] getColors() {
+    public int[][] getColors() {
         return colors;
     }
 
