@@ -1,14 +1,7 @@
 package DataAccesLayer;
 
-import Datastructures.MultiResTree;
-import Datastructures.MultiResolutionNode;
-import Datastructures.OctreeNode;
-import Datastructures.Raster;
+import Datastructures.*;
 import fi.iki.elonen.NanoHTTPD;
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
-import org.la4j.Vector;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,12 +28,13 @@ public class ApiController extends NanoHTTPD {
                 byte[] protobuf = buildMRTProto(mrt).toByteArray();
                 return  NanoHTTPD.newFixedLengthResponse(Response.Status.OK,"application/octet-stream",
                         new ByteArrayInputStream(protobuf), protobuf.length);
+
             case "samples":
                 String key =  params.get("id");
                 if (map.containsKey(key)){
                     //return NanoHTTPD.newFixedLengthResponse(map.get(key).toString());
                     MultiResolutionNode n = (MultiResolutionNode) map.get(key);
-                    byte[] protobufRaster = buildRasterProto(n.raster).toByteArray();
+                    byte[] protobufRaster = n.getPointsAsProto().toByteArray();
                     return  NanoHTTPD.newFixedLengthResponse(Response.Status.OK,"application/octet-stream",
                             new ByteArrayInputStream(protobufRaster), protobufRaster.length);
                 }
@@ -70,24 +64,6 @@ public class ApiController extends NanoHTTPD {
                 b.addOctant(i, _buildMRTProto(MultiResTreeProtos.MRTree.MRNode.newBuilder(), node.octants[i]));
             }
         }
-
         return b.build();
     }
-
-    static private RasterProtos.Raster buildRasterProto(Raster r){
-        RasterProtos.Raster.Builder b = RasterProtos.Raster.newBuilder();
-        for (Triplet<double[], int[], Integer> t: r){
-            RasterProtos.Raster.Point3DRGB.Builder bP = RasterProtos.Raster.Point3DRGB.newBuilder();
-            for (int i = 0; i < 3; i++) {
-                bP.addPosition(t.getValue0()[i]);
-                bP.addColor(t.getValue1()[i]);
-            }
-            bP.setSize(t.getValue2());
-            b.addSample(bP);
-        }
-        return b.build();
-    }
-
-
-
 }

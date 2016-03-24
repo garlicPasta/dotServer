@@ -29,8 +29,6 @@ public class App {
         mt.createIndex();
 
         ac = new ApiController(PORT, mt);
-
-
         properties = loadProperties();
     }
 

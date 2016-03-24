@@ -1,11 +1,8 @@
 package Datastructures;
 
-import org.javatuples.Pair;
 import org.junit.Before;
 import org.junit.Test;
-import utils.NvmParser;
 
-import static org.junit.Assert.*;
 
 public class MultiResTreeTest {
 
@@ -14,17 +11,21 @@ public class MultiResTreeTest {
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException {
         mt = new MultiResTree();
-        NvmParser parser = new NvmParser("/model2.nvm");
-        for (Point3DRGB p : parser ){
-            mt.insert(p);
-        }
     }
 
     @Test
-    public void testInsertRoot(){
-        Integer sum = 0;
-        for (Pair<int[], Integer> p : mt.root.raster.getRaster().values())
-            sum += p.getValue1();
-        assertEquals( new Integer(mt.totalInserts), sum);
+    public void testExtendRoot(){
+        for (double i = -0.5; i < 0.5; i+=0.0625) {
+            for (double j = -0.5; j < 0.5; j+=0.0625) {
+                for (double k = -0.5; k < 0.5; k += 0.0625) {
+                    mt.insert(new Point3DRGB(new double[]{i, j, k}));
+                }
+            }
+        }
+        assert mt.root.raster.getSampleCount() == 16 * 16 * 16;
+        mt.insert(new Point3DRGB(new double[]{1,0.5,0.5}));
+        assert mt.root.raster.getSampleCount() == 16 * 16 * 16 + 1;
     }
+
 }
+

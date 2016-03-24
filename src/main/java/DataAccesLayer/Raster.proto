@@ -6,8 +6,8 @@ message Raster{
     repeated Point3DRGB sample = 1;
 
     message Point3DRGB{
-        repeated double position = 1;
-        repeated int32 color = 2;
+        repeated float position = 1;
+        repeated float color = 2;
         required int32 size = 3;
     }
 }

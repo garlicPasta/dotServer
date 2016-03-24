@@ -2,6 +2,7 @@ package Datastructures;
 
 
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
@@ -43,9 +44,16 @@ public class MultiResTree{
         newRoot.createChildren();
 
         int newIndex = newRoot.determineOctant(root.center);
+
+        if (root.isLeaf){
+            for (Point3DRGB point : root.points){
+                newRoot.raster.addToRaster(point);
+            }
+        }else{
+            for ( Triplet<Vector,float[], Integer> e : root.raster.iterateAbsolutSample())
+                newRoot.raster.addToRaster(e.getValue0(), new Pair<>(e.getValue1(), e.getValue2()));
+        }
         newRoot.octants[newIndex] = root;
-        Vector offset = getOctantOffset(newIndex);
-        stamp3dArray(newRoot.raster.getRaster(), root.raster.getDownSampledRaster(), offset);
         return newRoot;
     }
 
@@ -66,33 +74,6 @@ public class MultiResTree{
 
         for (int i=0; i <8; i++){
             _createIndex(n.octants[i]);
-        }
-    }
-
-
-    /**
-     * @param index
-     * @return
-     * Returns first vector for stamping.
-     */
-    private Vector getOctantOffset(int index){
-        int halfOffset = Raster.rasterSize / 2;
-        int m = index > 3 ? halfOffset: 0;
-
-        if (index % 4 == 0) {
-            return new BasicVector(new double[]{m, 0, 0});
-        } else if (index % 4 == 1) {
-            return new BasicVector(new double[]{m, 0, halfOffset});
-        } else if (index % 4 == 2) {
-            return new BasicVector(new double[]{m, halfOffset, halfOffset});
-        }
-        return new BasicVector(new double[]{m, halfOffset, 0});
-    }
-
-    private void stamp3dArray(Map<Vector, Pair<int[], Integer>> base,
-                              Map<Vector, Pair<int[], Integer>> pattern, Vector offset) {
-        for (Map.Entry<Vector, Pair<int[], Integer>> rasterPoint : pattern.entrySet()) {
-            base.put(rasterPoint.getKey().add(offset), rasterPoint.getValue());
         }
     }
 
@@ -118,7 +99,7 @@ public class MultiResTree{
      * @return
      * Returns iterates over all nodes in a certain level
      */
-    public Iterator<MultiResolutionNode> iterateSampleLevel(int level){
+    public Iterator<MultiResolutionNode> iterateSampleLevel(final int level){
         return new Iterator<MultiResolutionNode>() {
             MultiResolutionNode currentNode;
             LinkedList<MultiResolutionNode> stack;
@@ -152,5 +133,37 @@ public class MultiResTree{
                 return stack.pop();
             }
         };
+    }
+
+    public List<OctreeNode> getAllLeafs(){
+        List<OctreeNode> nodes = new LinkedList<>();
+        _getAllLeafs(root, nodes);
+        return nodes;
+    }
+
+    private void _getAllLeafs(OctreeNode currentNode, List<OctreeNode> nodes) {
+        if (currentNode.isLeaf){
+            nodes.add(currentNode);
+            return;
+        }
+        for (OctreeNode child: currentNode.octants){
+            _getAllLeafs(child, nodes);
+        }
+    }
+
+    public List<String> getLeafsIDs(){
+        List<String> list = new LinkedList<>();
+        _getChildrenIDs(root, list);
+        return list;
+    }
+
+    public  void _getChildrenIDs(OctreeNode node, List<String> list){
+        if (node.isLeaf){
+            list.add(node.id);
+            return;
+        }
+        for (OctreeNode n : node.octants){
+            _getChildrenIDs(n, list);
+        }
     }
 }

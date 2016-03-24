@@ -1,13 +1,15 @@
 package Datastructures;
 
+import DataAccesLayer.RasterProtos;
+import org.javatuples.Triplet;
 import org.la4j.Vector;
 
 import javax.json.JsonObjectBuilder;
+import java.util.List;
 
 public class MultiResolutionNode extends OctreeNode {
 
     public Raster raster;
-    Point3DRGB exampleVector;
 
     public MultiResolutionNode() {
         super();
@@ -44,5 +46,41 @@ public class MultiResolutionNode extends OctreeNode {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    public RasterProtos.Raster getPointsAsProto(){
+        if (isLeaf) {
+            return buildRasterProto(this.points);
+        }
+        return buildRasterProto(raster);
+    }
+
+
+     private RasterProtos.Raster buildRasterProto(Raster r){
+        RasterProtos.Raster.Builder b = RasterProtos.Raster.newBuilder();
+        for (Triplet<float[], float[], Integer> t: r){
+            RasterProtos.Raster.Point3DRGB.Builder bP = RasterProtos.Raster.Point3DRGB.newBuilder();
+            for (int i = 0; i < 3; i++) {
+                bP.addPosition( t.getValue0()[i]);
+                bP.addColor(t.getValue1()[i]);
+            }
+            bP.setSize(t.getValue2());
+            b.addSample(bP);
+        }
+        return b.build();
+    }
+
+     private RasterProtos.Raster buildRasterProto(List<Point3DRGB> pointList){
+        RasterProtos.Raster.Builder b = RasterProtos.Raster.newBuilder();
+        for (Point3DRGB p: pointList){
+            RasterProtos.Raster.Point3DRGB.Builder bP = RasterProtos.Raster.Point3DRGB.newBuilder();
+            for (int i = 0; i < 3; i++) {
+                bP.addPosition((float) p.position.get(i));
+                bP.addColor( p.color[i]);
+            }
+            bP.setSize(1);
+            b.addSample(bP);
+        }
+        return b.build();
     }
 }

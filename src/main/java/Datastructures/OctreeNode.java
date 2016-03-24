@@ -15,6 +15,7 @@ public class OctreeNode{
     public static int MAXPOINTS = 1000;
 
     public boolean isLeaf;
+    // Length of the hole Box
     public double cellLength;
     public Vector center;
     public String id;
@@ -102,10 +103,7 @@ public class OctreeNode{
      * Returns the octant index which contains the point p
      */
     public int determineOctant(Vector p){
-        int offset=0;
-        if (center.get(1) > p.get(1)){
-            offset=4;
-        }
+        int offset = center.get(1) > p.get(1)? 4 : 0;
         if (center.get(0) > p.get(0) &&  center.get(2) <= p.get(2))
             return 0 + offset;
         if (center.get(0) > p.get(0) &&  center.get(2) > p.get(2))
@@ -144,7 +142,7 @@ public class OctreeNode{
      * @param octantIndex
      * @return BasicVector
      *
-     * Calculates edges of the current cube regarding to to octant.
+     * Calculates outer corner of the current cube regarding to to octant.
      */
     public BasicVector calculateEdge(int octantIndex) {
         double d = this.cellLength / 2;

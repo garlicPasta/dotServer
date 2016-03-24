@@ -11,25 +11,37 @@ import org.apache.commons.collections.map.DefaultedMap;
 import org.la4j.vector.dense.BasicVector;
 import org.la4j.vector.functor.VectorFunction;
 
-public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
 
-    public static final int rasterSize = 128;
+public class Raster implements Iterable<Triplet<float[], float[], Integer>>{
+
+    public static final int RASTER_SIZE = 32;
     double rasterStep;
     double cellLength;
     private Vector zeroVector;
-    Map<Vector, Pair<int[], Integer>> rasterHash;
+    Map<Vector, Pair<float[], Integer>> rasterHash;
 
     public Raster(Vector center, double cellLength){
         this.zeroVector = center.subtract(cellLength / 2);
-        this.rasterStep = cellLength / rasterSize;
+        this.rasterStep = cellLength / RASTER_SIZE;
         this.cellLength = cellLength;
         rasterHash = new HashMap<>();
         this.rasterHash = DefaultedMap.decorate(rasterHash, new Pair<>(new double[3], 0));
     }
 
     public void addToRaster(Point3DRGB prgb){
-        Vector p = prgb.position;
-        Vector n = p.subtract(this.zeroVector);
+        Vector n =  normalizeVector(prgb.position);
+        Pair<float[], Integer> value = rasterHash.get(n);
+        rasterHash.put(n, new Pair<>(prgb.color ,value.getValue1() + 1));
+    }
+
+    public void addToRaster(Vector v, Pair<float[],Integer> pair){
+        Vector normV = normalizeVector(v);
+        Pair updatePair = pair.setAt1(rasterHash.get(normV).getValue1() + pair.getValue1());
+        rasterHash.put(normV, updatePair);
+    }
+
+    private Vector normalizeVector(Vector v){
+        Vector n = v.subtract(this.zeroVector);
         n.update(new VectorFunction() {
             @Override
             public double evaluate(int i, double value) {
@@ -37,16 +49,16 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
             }
         });
 
-        if (n.get(0) > rasterSize || n.get(1) > rasterSize || n.get(2) > rasterSize) {
+        if (n.get(0) > RASTER_SIZE || n.get(1) > RASTER_SIZE || n.get(2) > RASTER_SIZE) {
             throw new IllegalArgumentException("Vector is outside raster");
         }
-        Pair<int[], Integer> value = rasterHash.get(n);
-        rasterHash.put(n, new Pair<>(prgb.color ,value.getValue1() + 1));
+        return n;
+
     }
 
-    public Map<Vector, Pair<int[], Integer>> getDownSampledRaster() {
+    public Map<Vector, Pair<float[], Integer>> getDownSampledRaster() {
         Set<Vector> keys = rasterHash.keySet();
-        Map<Vector, Pair<int[], Integer>> newRasterHash = DefaultedMap.decorate(new HashMap<>(), new Integer(0));
+        Map<Vector, Pair<float[], Integer>> newRasterHash = DefaultedMap.decorate(new HashMap<>(), new Integer(0));
 
         for (Vector key: keys){
             Vector keyStart = key.copy();
@@ -57,13 +69,13 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
                 }
             });
             int sum = 0;
-            int[] color = new int[3];
+            float[] color = new float[3];
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
                     for (int k = 0; k < 2 ; k++) {
                         Vector keyBase = keyStart.add(new BasicVector(new double[]{i,j,k}));
                         if ( rasterHash.containsKey(keyBase)) {
-                            Pair<int[], Integer> v = rasterHash.get(keyBase);
+                            Pair<float[], Integer> v = rasterHash.get(keyBase);
                             color = v.getValue0();
                             sum += rasterHash.get(keyBase).getValue1();
                         }
@@ -76,7 +88,7 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
         return newRasterHash;
     }
 
-    public Map<Vector, Pair<int[], Integer>> getRaster() {
+    public Map<Vector, Pair<float[], Integer>> getRaster() {
         return rasterHash;
     }
 
@@ -87,7 +99,7 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<Vector, Pair<int[], Integer>> entry : rasterHash.entrySet()) {
+        for (Map.Entry<Vector, Pair<float[], Integer>> entry : rasterHash.entrySet()) {
             Vector position = entry.getKey().multiply(rasterStep).add(zeroVector);
             sb.append(position.toString());
             sb.append(' ');
@@ -102,9 +114,9 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
     }
 
     @Override
-    public Iterator<Triplet<double[], int[], Integer>> iterator() {
-        class RasterIterator implements Iterator<Triplet<double[], int[], Integer>> {
-            Iterator<Map.Entry<Vector,Pair<int[],Integer>>> i = rasterHash.entrySet().iterator();
+    public Iterator<Triplet<float[], float[], Integer>> iterator() {
+        class RasterIterator implements Iterator<Triplet<float[], float[], Integer>> {
+            Iterator<Map.Entry<Vector,Pair<float[],Integer>>> i = rasterHash.entrySet().iterator();
 
             @Override
             public boolean hasNext() {
@@ -112,14 +124,42 @@ public class Raster implements Iterable<Triplet<double[],int[], Integer>>{
             }
 
             @Override
-            public Triplet<double[], int[], Integer> next() {
-                Map.Entry<Vector,Pair<int[],Integer>> e = i.next();
-                Vector key = e.getKey();
-                double[] pos = new double[] {key.get(0),key.get(1), key.get(2)};
+            public Triplet<float[], float[], Integer> next() {
+                Map.Entry<Vector,Pair<float[],Integer>> e = i.next();
+                Vector key = e.getKey().multiply(rasterStep).add(zeroVector);
+                float[] pos = new float[] {(float) key.get(0), (float) key.get(1), (float) key.get(2)};
                 return new Triplet<>(pos, e.getValue().getValue0(), e.getValue().getValue1());
             }
         }
         return new RasterIterator();
     }
 
+    public int getSampleCount(){
+        return rasterHash.size();
+    }
+
+    public Iterable<Triplet<Vector,float[], Integer>> iterateAbsolutSample() {
+        class AbsolutRasterIterator implements Iterator<Triplet<Vector,float[], Integer>>, Iterable<Triplet<Vector,float[], Integer>> {
+            Iterator<Map.Entry<Vector,Pair<float[],Integer>>> i = rasterHash.entrySet().iterator();
+
+            @Override
+            public boolean hasNext() {
+                return i.hasNext();
+            }
+
+            @Override
+            public Triplet<Vector, float[], Integer> next() {
+                Map.Entry<Vector,Pair<float[],Integer>> e = i.next();
+                return new Triplet<>(e.getKey().multiply(rasterStep).add(zeroVector),
+                        e.getValue().getValue0(),
+                        e.getValue().getValue1());
+            }
+
+            @Override
+            public Iterator<Triplet<Vector, float[], Integer>> iterator() {
+                return this;
+            }
+        }
+        return new AbsolutRasterIterator();
+    }
 }

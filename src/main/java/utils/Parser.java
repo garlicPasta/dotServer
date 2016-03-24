@@ -36,7 +36,7 @@ public abstract class Parser implements Iterable<Point3DRGB>{
     }
 
     protected double[][] vertices;
-    protected int[][] colors;
+    protected float[][] colors;
     protected State parserState;
 
     public Parser(String fileName){
@@ -57,14 +57,14 @@ public abstract class Parser implements Iterable<Point3DRGB>{
 
     protected void createVertexArrays(int verticesCounter){
         vertices = new double[verticesCounter][3];
-        colors = new int[verticesCounter][3];
+        colors = new float[verticesCounter][3];
     }
 
     public double[][] getVertices() {
         return vertices;
     }
 
-    public int[][] getColors() {
+    public float[][] getColors() {
         return colors;
     }
 

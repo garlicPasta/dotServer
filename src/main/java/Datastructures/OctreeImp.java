@@ -4,6 +4,8 @@ import org.la4j.Vector;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class OctreeImp {
@@ -52,4 +54,5 @@ public class OctreeImp {
         }
         return Collections.max(max);
     }
+
 }
