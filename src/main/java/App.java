@@ -16,16 +16,14 @@ public class App {
     private static Properties properties;
     private static ApiController ac;
 
-    public App() throws IOException {
-    }
+    public App() throws IOException {}
 
     public static void main(String[] args) throws Exception {
-        NvmParser parser = new NvmParser("/model2.nvm");
+        NvmParser parser = new NvmParser("/model4.nvm");
         MultiResTree mt = new MultiResTree();
         for (Point3DRGB p : parser ){
             mt.insert(p);
         }
-
         mt.createIndex();
 
         ac = new ApiController(PORT, mt);

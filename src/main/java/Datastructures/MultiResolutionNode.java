@@ -38,7 +38,7 @@ public class MultiResolutionNode extends OctreeNode {
     @Override
     public JsonObjectBuilder toJsonBuilder(){
         JsonObjectBuilder jB = super.toJsonBuilder();
-        jB.add("pointCount", this.pointCount);
+        jB.add("pointCount", this.getSampleCount());
         return jB;
 
     }
@@ -82,5 +82,10 @@ public class MultiResolutionNode extends OctreeNode {
             b.addSample(bP);
         }
         return b.build();
+    }
+
+    @Override
+    public int getSampleCount(){
+        return isLeaf? points.size() : raster.getSampleCount();
     }
 }

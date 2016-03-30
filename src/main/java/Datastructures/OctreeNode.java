@@ -22,7 +22,6 @@ public class OctreeNode{
     List<Point3DRGB> points = new LinkedList<>();
     public OctreeNode[] octants;
     Map<String, OctreeNode > index;
-    public int pointCount;
 
     public OctreeNode(){
         this(new BasicVector(new double[3]), 1);
@@ -42,7 +41,7 @@ public class OctreeNode{
 
     public void insert(Point3DRGB p){
         if (this.isLeaf){
-            if (++pointCount > MAXPOINTS ){
+            if (getSampleCount() > MAXPOINTS ){
                 this.isLeaf = false;
                 this.createChildren();
                 for (Point3DRGB v : points){
@@ -115,29 +114,6 @@ public class OctreeNode{
         throw new IllegalArgumentException("Point is not member of the octant");
     }
 
-    public int inverseOctant(int octant_index){
-        switch(octant_index){
-            case 0:
-                return 6;
-            case 1:
-                return 7;
-            case 2:
-                return 4;
-            case 3:
-                return 5;
-            case 4:
-                return 2;
-            case 5:
-                return 3;
-            case 6:
-                return 0;
-            case 7:
-                return 1;
-            default:
-                throw new IllegalArgumentException("Octant indices must be between 0 and 7");
-        }
-    }
-
     /**
      * @param octantIndex
      * @return BasicVector
@@ -206,6 +182,10 @@ public class OctreeNode{
             jB.add(Integer.toString(i), octants[i].id);
         }
         return jB.build();
+    }
+
+    public int getSampleCount(){
+        return points.size();
     }
 }
 

@@ -55,7 +55,7 @@ public class ApiController extends NanoHTTPD {
                                                                     OctreeNode node){
         b.setId(node.id);
         b.setCellLength(node.cellLength);
-        b.setPointCount(node.pointCount);
+        b.setPointCount(node.getSampleCount());
         b.setIsLeaf(node.isLeaf);
         b.addAllCenter(node.center);
 
