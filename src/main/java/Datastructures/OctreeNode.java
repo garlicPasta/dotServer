@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class OctreeNode{
 
-    public static int MAXPOINTS = 1000;
+    public static int MAXPOINTS = 100000;
 
     public boolean isLeaf;
     // Length of the hole Box

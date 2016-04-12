@@ -14,7 +14,7 @@ import org.la4j.vector.functor.VectorFunction;
 
 public class Raster implements Iterable<Triplet<float[], float[], Integer>>{
 
-    public static final int RASTER_SIZE = 32;
+    public static final int RASTER_SIZE = 128;
     double rasterStep;
     double cellLength;
     private Vector zeroVector;

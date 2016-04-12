@@ -2,6 +2,8 @@ import Datastructures.MultiResTree;
 import Datastructures.Point3DRGB;
 import DataAccesLayer.ApiController;
 import utils.NvmParser;
+import utils.PlyParser;
+import utils.TxtParser;
 
 import java.io.*;
 import java.util.HashMap;
@@ -19,11 +21,16 @@ public class App {
     public App() throws IOException {}
 
     public static void main(String[] args) throws Exception {
-        NvmParser parser = new NvmParser("/model4.nvm");
+        //NvmParser parser = new NvmParser("/model3.nvm");
+        //PlyParser plyParser =new PlyParser() ;
+        //File plyFile = new File(plyParser.getClass().getResource("/xyzrgb_statuette.ply").toURI());
+        //plyParser.loadPLY(plyFile);
+        TxtParser parser = new TxtParser("/tower.xyz");
         MultiResTree mt = new MultiResTree();
         for (Point3DRGB p : parser ){
             mt.insert(p);
         }
+        parser = null;
         mt.createIndex();
 
         ac = new ApiController(PORT, mt);

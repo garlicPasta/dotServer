@@ -2,10 +2,13 @@ package DataAccesLayer;
 
 import Datastructures.*;
 import fi.iki.elonen.NanoHTTPD;
+import utils.CompressionUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 public class ApiController extends NanoHTTPD {
 
@@ -35,8 +38,14 @@ public class ApiController extends NanoHTTPD {
                     //return NanoHTTPD.newFixedLengthResponse(map.get(key).toString());
                     MultiResolutionNode n = (MultiResolutionNode) map.get(key);
                     byte[] protobufRaster = n.getPointsAsProto().toByteArray();
+                    byte[] compressed = null;
+                    try {
+                        compressed = CompressionUtils.compress(protobufRaster);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     return  NanoHTTPD.newFixedLengthResponse(Response.Status.OK,"application/octet-stream",
-                            new ByteArrayInputStream(protobufRaster), protobufRaster.length);
+                            new ByteArrayInputStream(compressed), compressed.length);
                 }
                 return NanoHTTPD.newFixedLengthResponse("Invalid Parameters \n depth:" + params.get("depth")
                         + "\n node:" + params.get("node"));
