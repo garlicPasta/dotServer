@@ -22,9 +22,9 @@ public class MultiResolutionTreeTest {
                 }
             }
         }
-        assert mt.root.raster.getSampleCount() == 16 * 16 * 16;
+        assert mt.getRoot().getSampleCount() == 16 * 16 * 16;
         mt.insert(new Point3DRGB(new double[]{1,0.5,0.5}));
-        assert mt.root.raster.getSampleCount() == 16 * 16 * 16 + 1;
+        assert mt.getRoot().getSampleCount() == 16 * 16 * 16 + 1;
     }
 
 }
