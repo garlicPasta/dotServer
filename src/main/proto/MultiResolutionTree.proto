@@ -14,4 +14,3 @@ message MRTree{
         repeated MRNode octant = 6;
     }
 }
-

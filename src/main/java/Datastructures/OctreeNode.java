@@ -21,7 +21,6 @@ public class OctreeNode{
     public String id;
     List<Point3DRGB> points = new LinkedList<>();
     public OctreeNode[] octants;
-    Map<String, OctreeNode > index;
 
     public OctreeNode(){
         this(new BasicVector(new double[3]), 1);
@@ -57,12 +56,15 @@ public class OctreeNode{
         octants[octant_index].insert(p);
     }
 
-    public void createChildren() {
+    public int getSampleCount(){
+        return points.size();
+    }
+
+    protected void createChildren() {
         this.isLeaf = false;
         for (int i=0; i<8; i++){
             Vector p = calculateNodeCenter(i);
             octants[i] = new MultiResolutionNode(p, cellLength / 2);
-            octants[i].index = index;
         }
     }
 
@@ -71,7 +73,7 @@ public class OctreeNode{
      * @return BasicVector
      * Function returns the center point of a child
      */
-    public Vector calculateNodeCenter(int octant_index){
+    private Vector calculateNodeCenter(int octant_index){
         double d = cellLength / 4;
         double u=1;
         BasicVector c;
@@ -101,7 +103,7 @@ public class OctreeNode{
      * @return
      * Returns the octant index which contains the point p
      */
-    public int determineOctant(Vector p){
+    protected int determineOctant(Vector p){
         int offset = center.get(1) > p.get(1)? 4 : 0;
         if (center.get(0) > p.get(0) &&  center.get(2) <= p.get(2))
             return 0 + offset;
@@ -120,7 +122,7 @@ public class OctreeNode{
      *
      * Calculates outer corner of the current cube regarding to to octant.
      */
-    public BasicVector calculateEdge(int octantIndex) {
+    protected BasicVector calculateEdge(int octantIndex) {
         double d = this.cellLength / 2;
 
         switch (octantIndex){
@@ -146,7 +148,7 @@ public class OctreeNode{
     }
 
 
-    public boolean isInBoundingBox(Vector p){
+    protected boolean isInBoundingBox(Vector p){
         double cellLength = this.cellLength / 2;
         return  ((center.get(0) + cellLength) >= p.get(0)) && ((center.get(0) - cellLength) <=  p.get(0)) &&
                 ((center.get(1) + cellLength) >= p.get(1)) && ((center.get(1) - cellLength) <=  p.get(1)) &&
@@ -184,8 +186,5 @@ public class OctreeNode{
         return jB.build();
     }
 
-    public int getSampleCount(){
-        return points.size();
-    }
 }
 

@@ -39,12 +39,12 @@ public abstract class Parser implements Iterable<Point3DRGB>{
     protected float[][] colors;
     protected State parserState;
 
-    public Parser(String fileName){
+    public Parser(File file){
         parserState= State.Header;
         BufferedReader br = null;
 
         try {
-            br = new BufferedReader(new FileReader(this.getClass().getResource(fileName).getFile()));
+            br = new BufferedReader(new FileReader(file));
             String line;
             while( (line=br.readLine()) != null )
             {

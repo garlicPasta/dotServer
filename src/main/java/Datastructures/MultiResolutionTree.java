@@ -1,30 +1,29 @@
 package Datastructures;
 
 
+import DataAccesLayer.MultiResTreeProtos;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.la4j.Vector;
-import org.la4j.vector.dense.BasicVector;
 
 import java.util.*;
 
-public class MultiResTree{
+public class MultiResolutionTree {
 
     double rootLength = 1.0d; // Length of the root octant
     int totalInserts;
 
     public Map<String, OctreeNode> index;
-    MultiResolutionNode root;
+    private MultiResolutionNode root;
 
     public MultiResolutionNode getRoot() {
         return root;
     }
 
-    public MultiResTree() {
+    public MultiResolutionTree() {
         super();
         this.root = new MultiResolutionNode();
         index = new HashMap<>();
-        this.root.index = index;
     }
 
     public void insert(Point3DRGB p) {
@@ -77,6 +76,28 @@ public class MultiResTree{
         }
     }
 
+    public MultiResTreeProtos.MRTree buildMRTProto(){
+        MultiResTreeProtos.MRTree.Builder b = MultiResTreeProtos.MRTree.newBuilder();
+        b.setRoot(_buildMRTProto(MultiResTreeProtos.MRTree.MRNode.newBuilder(), getRoot()));
+        return b.build();
+    }
+
+    private MultiResTreeProtos.MRTree.MRNode _buildMRTProto( MultiResTreeProtos.MRTree.MRNode.Builder b,
+                                                                    OctreeNode node){
+        b.setId(node.id);
+        b.setCellLength(node.cellLength);
+        b.setPointCount(node.getSampleCount());
+        b.setIsLeaf(node.isLeaf);
+        b.addAllCenter(node.center);
+
+        if (!node.isLeaf) {
+            for (int i = 0; i < 8; i++){
+                b.addOctant(i, _buildMRTProto(MultiResTreeProtos.MRTree.MRNode.newBuilder(), node.octants[i]));
+            }
+        }
+        return b.build();
+    }
+
     public Integer getDepth(){
         return _getDepth(root);
     }
@@ -94,46 +115,6 @@ public class MultiResTree{
         return Collections.max(max);
     }
 
-    /**
-     * @param level
-     * @return
-     * Returns iterates over all nodes in a certain level
-     */
-    public Iterator<MultiResolutionNode> iterateSampleLevel(final int level){
-        return new Iterator<MultiResolutionNode>() {
-            MultiResolutionNode currentNode;
-            LinkedList<MultiResolutionNode> stack;
-            LinkedList<Point3DRGB> points;
-            {
-                currentNode = root;
-                stack = new LinkedList<>();
-                fillUpStack(root, level);
-            }
-
-            private void fillUpStack(MultiResolutionNode node , int level) {
-                if (node == null) {
-                    return;
-                }
-                if (level == 0 ){
-                    stack.add(node);
-                    return;
-                }
-                for (int i = 0; i < 8 ; i++) {
-                    fillUpStack((MultiResolutionNode) node.octants[i], level -1);
-                }
-            }
-
-            @Override
-            public boolean hasNext() {
-                return !stack.isEmpty();
-            }
-
-            @Override
-            public MultiResolutionNode next() {
-                return stack.pop();
-            }
-        };
-    }
 
     public List<OctreeNode> getAllLeafs(){
         List<OctreeNode> nodes = new LinkedList<>();
@@ -165,5 +146,13 @@ public class MultiResTree{
         for (OctreeNode n : node.octants){
             _getChildrenIDs(n, list);
         }
+    }
+
+    public OctreeNode getNodeByID(String key){
+        return index.get(key);
+    }
+
+    public boolean containsKey(String key){
+        return index.containsKey(key);
     }
 }

@@ -11,13 +11,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class MultiResTreeNVMTest {
+public class MultiResolutionTreeNVMTest {
 
-    MultiResTree mt;
+    MultiResolutionTree mt;
 
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException {
-        mt = new MultiResTree();
+        mt = new MultiResolutionTree();
         NvmParser parser = new NvmParser("/model2.nvm");
         for (Point3DRGB p : parser ){
             mt.insert(p);

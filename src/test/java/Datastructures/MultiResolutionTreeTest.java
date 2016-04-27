@@ -4,13 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class MultiResTreeTest {
+public class MultiResolutionTreeTest {
 
-    MultiResTree mt;
+    MultiResolutionTree mt;
 
     @Before
     public void setUp() throws IllegalAccessException, InstantiationException {
-        mt = new MultiResTree();
+        mt = new MultiResolutionTree();
     }
 
     @Test

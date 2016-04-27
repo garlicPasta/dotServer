@@ -48,7 +48,7 @@ public class MultiResolutionNode extends OctreeNode {
         return super.toString();
     }
 
-    public RasterProtos.Raster getPointsAsProto(){
+    public RasterProtos.Raster getSampleProto(){
         if (isLeaf) {
             return buildRasterProto(this.points);
         }

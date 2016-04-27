@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 
 public class NvmParser extends Parser {
 
@@ -7,8 +8,8 @@ public class NvmParser extends Parser {
     int cameraCounter;
     int verticesCounter;
 
-    public NvmParser(String fileName){
-        super(fileName);
+    public NvmParser(File file){
+        super(file);
     }
 
     @Override

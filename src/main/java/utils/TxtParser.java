@@ -1,18 +1,20 @@
 package utils;
 
+import java.io.File;
+
 public class TxtParser extends Parser{
     int verticesCounter=0;
     int colorCounter=0;
     int lineCount;
 
-    public TxtParser(String fileName) {
-        super(fileName);
+    public TxtParser(File f) {
+        super(f);
     }
 
     @Override
     protected void parseLine(String line) {
         if (parserState == State.Header) {
-            lineCount = 20000000;
+            lineCount = 10000000;
             createVertexArrays(lineCount);
             parserState = State.Vertices;
         }
