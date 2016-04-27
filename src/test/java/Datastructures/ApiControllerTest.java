@@ -10,8 +10,6 @@ public class ApiControllerTest {
 
     @Before
     public void setUp() {
-        NvmParser p = new NvmParser("/model2.nvm");
-        mrt = new MultiResolutionTree();
     }
 
     @Test
