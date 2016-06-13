@@ -7,9 +7,6 @@ import utils.PlyParser;
 import utils.TxtParser;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 
 public class App {
@@ -23,8 +20,14 @@ public class App {
         options.addOption(new Option("t", true, "specifies type of input file"));
         options.addOption(new Option("f", true, "specifies input file"));
         options.addOption(new Option("p", true, "specifies port of server"));
+        options.addOption(new Option("h", false, "prints help"));
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse( options, args);
+        if (cmd.hasOption("h")){
+            HelpFormatter hf = new HelpFormatter();
+            hf.printHelp("dotViewer",options);
+            return;
+        }
         MultiResolutionTree mt = new MultiResolutionTree();
         for (Point3DRGB p : getPointData(cmd) ){
             mt.insert(p);

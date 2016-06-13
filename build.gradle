@@ -32,6 +32,14 @@ protobuf {
     generatedFilesBaseDir = 'src/'
 }
 
+jar{
+    manifest {
+        attributes 'Implementation-Title': 'dotViewerJar',
+                'Implementation-Version': version,
+                'Main-Class': 'App'
+    }
+}
+
 
 task fatJar(type: Jar) {
     manifest {
