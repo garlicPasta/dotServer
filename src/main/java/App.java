@@ -2,7 +2,6 @@ import Datastructures.MultiResolutionTree;
 import Datastructures.Point3DRGB;
 import DataAccesLayer.ApiController;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.IllegalClassException;
 import utils.NvmParser;
 import utils.PlyParser;
 import utils.TxtParser;
@@ -15,13 +14,7 @@ import java.util.Properties;
 
 public class App {
     private static final int PORT= 8080;
-    private static final int PAGESIZE= 1000;
-    private static Map<String, String> map = new HashMap<>();
-    private static Properties properties;
     private static ApiController ac;
-    private enum FileType {
-        PLY, TXT, NVM
-    }
 
     public App() throws IOException {}
 
@@ -32,31 +25,30 @@ public class App {
         options.addOption(new Option("p", true, "specifies port of server"));
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse( options, args);
-        //NvmParser parser = new NvmParser("/model3.nvm");
-        //TxtParser parser = new TxtParser("/tower.xyz");
         MultiResolutionTree mt = new MultiResolutionTree();
         for (Point3DRGB p : getPointData(cmd) ){
             mt.insert(p);
         }
-        parser = null;
         mt.createIndex();
-
         ac = new ApiController(PORT, mt);
     }
 
     static public Iterable<Point3DRGB> getPointData(CommandLine cmd) throws MissingArgumentException {
-        String fileType = new String();
+        String fileType;
         if (!cmd.hasOption('f'))
             throw new MissingArgumentException("Specify an input file");
         if (cmd.hasOption("t")){
             fileType = cmd.getOptionValue('t');
         }else{
-            String[] filename = cmd.getOptionValue('f').split(".");
+            String[] filename = cmd.getOptionValue('f').split("\\.");
             if (filename.length > 2)
                 throw new IllegalArgumentException("Malformed filename");
             fileType = filename[1];
         }
-        String filePath = System.getProperty("user.dir") + "/" + cmd.getOptionValue('f');
+        String filePath = cmd.getOptionValue('f');
+        if (!filePath.startsWith("/")){
+            filePath = System.getProperty("user.dir") + "/" + filePath;
+        }
         File f = new File(filePath);
         if (!f.exists()){
             throw new IllegalArgumentException("File does not exist");

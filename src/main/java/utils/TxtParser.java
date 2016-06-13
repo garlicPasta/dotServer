@@ -14,7 +14,7 @@ public class TxtParser extends Parser{
     @Override
     protected void parseLine(String line) {
         if (parserState == State.Header) {
-            lineCount = 10000000;
+            lineCount = 20000000;
             createVertexArrays(lineCount);
             parserState = State.Vertices;
         }

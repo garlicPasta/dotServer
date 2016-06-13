@@ -1,15 +1,19 @@
-# PointCloudServer
-View dependent streaming of vast point clouds.
+# dotServer
 
-# Usage
+dotServer is part of a client-server system  for displaying and exploring 
+huge Pointclouds on Android Devices.
 
-# Build
+The corresponding client u can find [here](https://github.com/garlicPasta/dotViewer).
+
+![example_picture](https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/bstelle_mid4.png)
+![example_picture2](https://raw.githubusercontent.com/garlicPasta/AndroidPointCloudVisualizer/master/readme/img/close_terra1.png)
+
 ## Dependencies :
 * gradle
-* Goggle Protocoll Buffers protoc
+* goggle protocol buffers
 
 ## Build
-For building run the following command
+For building run the following command in the project root
 
     gradle build
 

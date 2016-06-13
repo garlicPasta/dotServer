@@ -32,14 +32,6 @@ protobuf {
     generatedFilesBaseDir = 'src/'
 }
 
-sourceSets {
-    main {
-        proto {
-            srcDir 'src/main/protobuf'
-        }
-        java{}
-    }
-}
 
 task fatJar(type: Jar) {
     manifest {

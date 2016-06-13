@@ -29,7 +29,7 @@ public class OctreeNode{
     public OctreeNode(Vector center, double d, String id) {
         this.center = center;
         this.cellLength = d;
-        this.id = id.replaceAll("\\s+","");
+        this.id = id.replaceAll("\\s+","-");
         this.isLeaf = true;
         octants= new OctreeNode[8];
     }
